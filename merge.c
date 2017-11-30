@@ -2,76 +2,113 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX_ELEMENTS  10000000
+#define MAX_ELEMENTS  10
 
-void merge(int a[], int i1, int j1, int i2, int j2);
-void mergeSort(int a[], int i, int j);
+void merge(int arr[], int p, int q, int r);
+void mergeSort(int arr[], int i, int j);
+void printArray(int arr[]);
+void populateArray(int arr[]);
 
-int testa[MAX_ELEMENTS];
-int testb[MAX_ELEMENTS - 1];
+int elementArray[MAX_ELEMENTS];
 
-void mergeSort(int a[], int i, int j)
+//l is for left index and r is right index of the sub-array of arr to be sorted
+void mergeSort(int arr[], int l, int r)
 {
-  int middle;
+   if (l < r)
+   {
+      int middle = (l+r)/2;
+      mergeSort(arr, l, middle);
+      mergeSort(arr, middle+1, r);
+      merge(arr, l, middle, r);
+   }
+}
 
-  if(i < j)
+//
+void merge(int arr[], int l, int m, int r)
+{
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 =  r - m;
+
+    int Left[n1];
+    int Right[n2];
+
+    //Copy data into temp arrays for sub arrays (left and right, broken about the middle)
+    for(i=0; i < n1; i++)
+    {
+      Left[i] = arr[l+i];
+    }
+
+    for(j=0; j < n2; j++)
+    {
+      Right[j] = arr[m+j+1];
+    }
+
+    i = 0;
+    j = 0;
+    k = 1;
+
+    //Go through and compare the left and right indexes of the sub array to sort biggest through smallest
+    while (i < n1 && j < n2)
+    {
+      if(Left[i] <= Right[j])
+      {
+        arr[k]= Left[i];
+        i++;
+      }
+      else
+      {
+        arr[k] = Right[j];
+        j++;
+      }
+      k++;
+    }
+
+    //Copy the rest of the elements from the subarrays
+    while(i<n1)
+    {
+      arr[k] = Left[i];
+      i++;
+      k++;
+    }
+
+    while(j < n2)
+    {
+      arr[k] = Right[j];
+      j++;
+      k++;
+    }
+
+}
+
+//Print array to console
+void printArray(int arr[])
+{
+  int i;
+  printf("sorted array:\n");
+  for(i = 0; i < MAX_ELEMENTS; i++)
   {
-    middle = (i+j)/2;
-    mergeSort(a, i, middle);
-    mergeSort(a, middle+1, j);
-    merge(a, i, middle, middle + 1, j);
+    printf("%d\n",elementArray[i]);
   }
 }
 
-void merge(int a[], int i1, int j1, int i2, int j2)
+//Populates array with random numbers
+void populateArray(int arr[])
 {
-  int i, j, k;
-  i = i1;
-  j = i2;
-  k = 0;
-
-  while(i <= j1 && j <= j2)
+  int i;
+  //get seed based on current time
+  srand(time(NULL));
+  for(i = 0; i <= MAX_ELEMENTS; i++)
   {
-    if(a[i] < a[j])
-    {
-      testb[k++]=a[i++];
-    }
-    else
-    {
-      testb[k++] = a[j++];
-    }
-  }
-
-  while(i <= j1)
-  {
-    testb[k++] = a[i++];
-  }
-
-  while(j <= j2)
-  {
-    testb[k++] = a[j++];
-  }
-
-  j=0;
-  for(i = i1; i <= j2; i++, j++)
-  {
-    a[i] = testb[j];
+    elementArray[i] = rand()%100;//randomizes up to uint 32 max
   }
 }
 
 int main()
 {
-  int i;
-  srand(time(NULL));
-  for(i = 0; i <= MAX_ELEMENTS; i++)
-  {
-    testa[i] = rand();
-  }
-  mergeSort(testa, 0, MAX_ELEMENTS - 1);
-  printf("sorted array:\n");
-  for(i = 0; i < MAX_ELEMENTS - 1; i++)
-  {
-    printf("%d\n",testa[i]);
-  }
+  populateArray(elementArray);
+  mergeSort(elementArray, 0, MAX_ELEMENTS - 1);
+  printArray(elementArray);
+
   return 0;
 }
