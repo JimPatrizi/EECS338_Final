@@ -1,13 +1,15 @@
 //Jim Patrizi
 //EECS 338 Final
-#include<stdlib.h>
-#include<stdio.h>
+#include <stdio.h>
+#include <omp.h>
+#include <stdlib.h> // For atoi()
+#include <sys/time.h>
 #include <time.h>
 
-#define MAX_ELEMENTS 1000000
+#define MAX_ELEMENTS 2000000
 
 int elementArray[MAX_ELEMENTS];
-
+struct timeval start_time, stop_time, elapsed_time;  // timers
 
 void merge(int arr[], int l, int m, int r);
 void populateArray(int arr[]);
@@ -36,7 +38,7 @@ void merge(int arr[], int l, int m, int r)
     //create temp arrays for left and right sides of array
     int L[n1], R[n2];
 
-    //copy data to temps
+    //copy data temp left and right array
     for (i = 0; i < n1; i++)
         L[i] = arr[l + i];
     for (j = 0; j < n2; j++)
@@ -83,7 +85,6 @@ void merge(int arr[], int l, int m, int r)
 void printArray(int arr[], int array_size)
 {
   int i;
-  printf("sorted array:\n");
   for(i = 0; i < array_size; i++)
   {
     printf("%d\n",elementArray[i]);
@@ -98,18 +99,22 @@ void populateArray(int arr[])
   srand(time(NULL));
   for(i = 0; i <= MAX_ELEMENTS; i++)
   {
-    elementArray[i] = rand();//randomizes up to uint 32 max
+    elementArray[i] = rand()%MAX_ELEMENTS;//randomizes up to uint 32 max
   }
 }
 
-/* Driver program to test above functions */
+//Test finctions
 int main()
 {
     populateArray(elementArray);
-    int arr_size = sizeof(elementArray)/sizeof(elementArray[0]);
-    mergeSort(elementArray, 0, arr_size - 1);
+    int size = sizeof(elementArray)/sizeof(elementArray[0]);
+    gettimeofday(&start_time,NULL); // Unix timer
+    mergeSort(elementArray, 0, size - 1);
+    gettimeofday(&stop_time,NULL);
+	  timersub(&stop_time, &start_time, &elapsed_time); // Unix time subtract routine
+	  printf("Total time was %f seconds.\n", elapsed_time.tv_sec+elapsed_time.tv_usec/1000000.0);
 
     printf("\nSorted array is \n");
-    printArray(elementArray, arr_size);
+    //printArray(elementArray, size);
     return 0;
 }
